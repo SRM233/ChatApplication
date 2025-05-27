@@ -1,9 +1,11 @@
 package UserInterface;
 
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 
 public class LoginFrame extends JFrame {
     private JTextField usernameField;
@@ -26,7 +28,7 @@ public class LoginFrame extends JFrame {
         // Username label
         JLabel label = new JLabel("Enter your username:");
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
+
         // Username field with fixed width
         usernameField = new JTextField();
         usernameField.setMaximumSize(new Dimension(200, 30));
@@ -51,17 +53,34 @@ public class LoginFrame extends JFrame {
     private void handleLogin(ActionEvent e) {
         String username = usernameField.getText().trim();
         if (!username.isEmpty()) {
-            SwingUtilities.invokeLater(() -> {
-                new ChatFrame(username);
+
+            try {
+                //Create a socket connection to the server
+                Socket socket = new Socket(Constant.IP_ADDRESS, Constant.PORT);
+
+                //Create a DataOutputStream to send data to the server
+                DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+
+                //Send the message type
+                dos.writeInt(1);
+
+                //send the username to the server
+                dos.writeUTF(username);
+                
+
+                new ChatFrame(username, socket);
+
                 dispose();
-            });
+
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+
         } else {
-            JOptionPane.showMessageDialog(this, 
-                "Username cannot be empty!");
+            JOptionPane.showMessageDialog(this,
+                    "Username cannot be empty!");
         }
     }
 
-    // public static void main(String[] args) {
-    //     SwingUtilities.invokeLater(LoginFrame::new);
-    // }
 }

@@ -18,36 +18,41 @@ public class ServerThread extends Thread {
     public void run() {
         try {
             dis = new DataInputStream(socket.getInputStream());
-            int type = dis.readInt();
 
-            switch (type) {
-                case 1:
-                    // Read the username from the client
-                    String name = dis.readUTF();
-                    Server.OnlineUserNames.put(socket, name);
-                    updateOnlineUserNamesList();
-                    break;
+            while (true) {
+                int type = dis.readInt();
 
-                case 2:
+                switch (type) {
+                    case 1:
+                        // Read the username from the client
+                        String name = dis.readUTF();
+                        Server.OnlineUserNames.put(socket, name);
+                        updateOnlineUserNamesList();
+                        break;
 
-                    // Read the message from the client
-                    String message = dis.readUTF();
-                    updateMsgToAllUsers(message);
+                    case 2:
 
-                    break;
+                        // Read the message from the client
+                        String message = dis.readUTF();
+                        updateMsgToAllUsers(message);
 
-                default:
-                    break;
+                        break;
+
+                    default:
+                        break;
+                }
             }
 
         } catch (IOException e) {
             // TODO Auto-generated catch block
             System.out.println("Client disconnected: " + socket.getInetAddress());
+            Server.OnlineUserNames.remove(socket);
             updateOnlineUserNamesList();
         }
     }
 
     private void updateMsgToAllUsers(String message) {
+        System.out.println(message);
         for (Socket socket : Server.OnlineUserNames.keySet()) {
             DataOutputStream dos;
             try {

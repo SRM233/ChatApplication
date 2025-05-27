@@ -11,6 +11,7 @@ public class Server {
 
     public static void main(String[] args) throws Exception {
 
+        System.out.println("Server is running...");
         // Create a server socket with the specified port.
         ServerSocket serverSocket = new ServerSocket(Constant.PORT);
 
